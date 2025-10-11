@@ -29,14 +29,12 @@ final class EditorController extends AbstractController
 
         $cacheIdentifier = "getAllEditors-" . $page . "-" . $limit;
 
-        $editors = $cachePool->get($cacheIdentifier,
-            function (ItemInterface $item) use ($editorRepository, $page, $limit){
-                $item->tag("editorCache");
-                return $editorRepository->findAllWithPagination($page, $limit);
-            }
-            );
-
-        $jsonEditors = $serializer->serialize($editors, 'json', ['groups' => ['editor:read']]);
+        $jsonEditors = $cachePool->get($cacheIdentifier, function (ItemInterface $item) use ($editorRepository, $page, $limit, $serializer) {
+            $item->tag("editorCache");
+            $editors = $editorRepository->findAllWithPagination($page, $limit);
+            return $serializer->serialize($editors, 'json', ['groups' => ['editor:read']]);
+        });
+    
         return new JsonResponse($jsonEditors, Response::HTTP_OK, [], true);
     }
 
@@ -86,7 +84,6 @@ final class EditorController extends AbstractController
     #[Route('/api/v1/editors', name: 'createEditor', methods: ['POST'])]
     public function createEditor(
         Request $request,
-        EditorRepository $editorRepository,
         EntityManager $em,
         SerializerInterface $serializer,
         ValidatorInterface $validator,
