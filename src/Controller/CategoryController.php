@@ -19,9 +19,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class CategoryController extends AbstractController
 {
     #[Route('/api/v1/categories', name: 'getCategories', methods: ['GET'])]
-    public function getCategories(CategoryRepository $categoryRepository, SerializerInterface $serializer): JsonResponse
+    public function getCategories(CategoryRepository $categoryRepository, SerializerInterface $serializer, Request $request): JsonResponse
     {
-        $categories = $categoryRepository->findAll();
+        $page = $request->get('page', default: 1);
+        $limit = $request->get('limit', default: 5);
+
+        $categories = $categoryRepository->findAllWithPagination($page, $limit);
         $jsonCategories = $serializer->serialize($categories, 'json', ['groups' => ['category:read']]);
         return new JsonResponse($jsonCategories, Response::HTTP_OK, [], true);
     }

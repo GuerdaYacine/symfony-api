@@ -16,13 +16,26 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 final class EditorController extends AbstractController
 {
     #[Route('/api/v1/editors', name: 'getEditors', methods: ['GET'])]
-    public function getEditors(EditorRepository $editorRepository, SerializerInterface $serializer): JsonResponse
+    public function getEditors(EditorRepository $editorRepository, SerializerInterface $serializer, Request $request, TagAwareCacheInterface $cachePool): JsonResponse
     {
-        $editors = $editorRepository->findAll();
+        $page = $request->get('page', default: 1);
+        $limit = $request->get('limit', default: 2);
+
+        $cacheIdentifier = "getAllEditors-" . $page . "-" . $limit;
+
+        $editors = $cachePool->get($cacheIdentifier,
+            function (ItemInterface $item) use ($editorRepository, $page, $limit){
+                $item->tag("editorCache");
+                return $editorRepository->findAllWithPagination($page, $limit);
+            }
+            );
+
         $jsonEditors = $serializer->serialize($editors, 'json', ['groups' => ['editor:read']]);
         return new JsonResponse($jsonEditors, Response::HTTP_OK, [], true);
     }
