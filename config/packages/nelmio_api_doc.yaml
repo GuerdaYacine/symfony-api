@@ -1,0 +1,47 @@
+nelmio_api_doc:
+    documentation:
+        paths:
+            /api/login_check:
+                post:
+                    tags: [Authentification]
+                    summary: "Génère un token JWT"
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    properties:
+                                        email:
+                                            type: string
+                                            example: admin@example.com
+                                        password:
+                                            type: string
+                                            example: admin123
+                    responses:
+                        "200":
+                            description: "Token JWT généré avec succès"
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+                                                example: "eyJ0eXAiOiJKV1QiLCJh..."
+                        "401":
+                            description: "Identifiants invalides"
+        info:
+            title: Symfony Api
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: []
+    areas:
+        path_patterns:
+            - ^/api(?!/doc$)

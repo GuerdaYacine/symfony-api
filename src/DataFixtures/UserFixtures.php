@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixtures extends Fixture
@@ -13,20 +14,20 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $usersData = [
-            ['email' => 'user1@example.com', 'password' => 'lolmdr123', 'roles' => ['ROLE_USER']],
-            ['email' => 'user2@example.com', 'password' => 'mdrlol456', 'roles' => ['ROLE_USER']],
-            ['email' => 'user3@example.com', 'password' => 'password123', 'roles' => ['ROLE_ADMIN']],
-            ['email' => 'user4@example.com', 'password' => 'secret456', 'roles' => ['ROLE_USER']],
-            ['email' => 'user5@example.com', 'password' => 'azerty789', 'roles' => ['ROLE_USER']],
-        ];
+        $faker = Factory::create('fr_FR');
 
-        foreach ($usersData as $data) {
+        for ($i = 0; $i < 10; $i++) {
             $user = new User();
-            $user->setEmail($data['email']);
-            $user->setRoles($data['roles']);
+            $name = mb_strtolower($faker->firstName()) . mb_strtolower($faker->lastName());
+            $user->setEmail($name . "@gmail.com");
+            if ($i < 2) {
+                $user->setRoles(['ROLE_ADMIN']);
+            } else {
+                $user->setRoles(['ROLE_USER']);
+            }
+            // reprenez tout ce qui est contenue avant le @ dans l'email et ajoutez 60 pour avoir le mdp ;)
             $user->setPassword(
-                $this->passwordHasher->hashPassword($user, $data['password'])
+                $this->passwordHasher->hashPassword($user, $name . "60")
             );
             $manager->persist($user);
         }
