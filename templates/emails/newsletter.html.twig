@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelles sorties de jeux vidéo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        .intro {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .game-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .game-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333333;
+            margin: 0 0 10px 0;
+        }
+        .game-info {
+            font-size: 14px;
+            color: #666666;
+            margin: 5px 0;
+        }
+        .game-info strong {
+            color: #333333;
+        }
+        .release-date {
+            display: inline-block;
+            background-color: #667eea;
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .game-description {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+        .no-games {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999999;
+            font-size: 16px;
+        }
+        .footer {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- En-tête -->
+        <div class="header">
+            <h1>🎮 Sorties de la Semaine</h1>
+            <p>Les jeux vidéo à ne pas manquer</p>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="content">
+            <p class="greeting">Bonjour !</p>
+            
+            <p class="intro">
+                Voici les jeux vidéo qui sortent dans les 7 prochains jours. 
+                Ne manquez pas ces nouvelles sorties !
+            </p>
+
+            {% if games is not empty %}
+                <!-- Liste des jeux -->
+                {% for game in games %}
+                    <div class="game-card">
+                        <h2 class="game-title">{{ game.title }}</h2>
+                        
+                        {% if game.editor %}
+                            <div class="game-info">
+                                <strong>Éditeur :</strong> {{ game.editor.name }}
+                            </div>
+                        {% endif %}
+                        
+                        {% if game.categories is not empty %}
+                            <div class="game-info">
+                                <strong>Catégories :</strong> 
+                                {% for category in game.categories %}
+                                    {{ category.name }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        {% if game.releaseDate %}
+                            <span class="release-date">
+                                📅 Sortie le {{ game.releaseDate|date('d/m/Y') }}
+                            </span>
+                        {% endif %}
+                        
+                        {% if game.description %}
+                            <p class="game-description">{{ game.description }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-games">
+                    <p>Aucune sortie prévue dans les 7 prochains jours.</p>
+                    <p>Restez connecté pour les prochaines nouveautés !</p>
+                </div>
+            {% endif %}
+
+            <div class="divider"></div>
+            
+            <p style="text-align: center; color: #999999; font-size: 14px;">
+                Vous recevez cet email car vous êtes abonné à notre newsletter.
+            </p>
+        </div>
+
+        <!-- Pied de page -->
+        <div class="footer">
+            <p><strong>© {{ 'now'|date('Y') }} MonSite Gaming</strong></p>
+        </div>
+    </div>
+</body>
+</html>

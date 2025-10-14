@@ -51,6 +51,9 @@ class VideoGame
     #[Groups(['videogame:read', 'videogame:write'])]
     private ?Editor $editor = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $coverImage = null;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -129,6 +132,18 @@ class VideoGame
     public function setEditor(?Editor $editor): static
     {
         $this->editor = $editor;
+
+        return $this;
+    }
+
+    public function getCoverImage(): ?string
+    {
+        return $this->coverImage;
+    }
+
+    public function setCoverImage(?string $coverImage): static
+    {
+        $this->coverImage = $coverImage;
 
         return $this;
     }

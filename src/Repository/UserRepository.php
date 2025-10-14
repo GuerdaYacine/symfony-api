@@ -41,6 +41,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
+    public function findSubscribers(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.subscription_to_newsletter = true')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */

@@ -92,7 +92,8 @@ final class UserController extends AbstractController
             properties: [
                 new OA\Property(property: "email", type: "string", description: "Email de l'utilisateur", example: "user@example.com"),
                 new OA\Property(property: "password", type: "string", description: "Mot de passe", example: "Password123&*"),
-                new OA\Property(property: "roles", type: "array", description: "Rôles de l'utilisateur", items: new OA\Items(type: "string"), default: ["ROLE_USER"], example: ["ROLE_USER"])
+                new OA\Property(property: "roles", type: "array", description: "Rôles de l'utilisateur", items: new OA\Items(type: "string"), default: ["ROLE_USER"], example: ["ROLE_USER"]),
+                new OA\Property(property: "subscription_to_newsletter", type: "boolean", description: "Abonné à la newsletter", example: true, default: false)
             ]
         )
     )]
@@ -134,7 +135,9 @@ final class UserController extends AbstractController
             properties: [
                 new OA\Property(property: "email", type: "string", description: "Nouvel email", example: "new@example.com"),
                 new OA\Property(property: "password", type: "string", description: "Nouveau mot de passe", example: "NewP@ssw0rd"),
-                new OA\Property(property: "roles", type: "array", description: "Nouveaux rôles", items: new OA\Items(type: "string"), example: ["ROLE_ADMIN"])
+                new OA\Property(property: "roles", type: "array", description: "Nouveaux rôles", items: new OA\Items(type: "string"), example: ["ROLE_ADMIN"]),
+                new OA\Property(property: "subscription_to_newsletter", type: "boolean", description: "Abonné à la newsletter", example: true, default: false)
+
             ]
         )
     )]

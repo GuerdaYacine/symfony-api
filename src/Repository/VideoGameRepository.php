@@ -19,10 +19,24 @@ class VideoGameRepository extends ServiceEntityRepository
     public function findAllWithPagination($page, $limit)
     {
         $qb = $this->createQueryBuilder('b')
-        ->setFirstResult(($page - 1) * $limit)
-        ->setMaxResults($limit);
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
         return $qb->getQuery()->getResult();
     }
+
+    public function findGamesNextWeek(): array
+    {
+        $now = new \DateTime();
+        $nextWeek = (new \DateTime())->modify('+7 days');
+
+        return $this->createQueryBuilder('v')
+            ->where('v.releaseDate BETWEEN :now AND :nextWeek')
+            ->setParameter('now', $now)
+            ->setParameter('nextWeek', $nextWeek)
+            ->getQuery()
+            ->getResult();
+    }
+
 
     //    /**
     //     * @return VideoGame[] Returns an array of VideoGame objects

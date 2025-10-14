@@ -29,11 +29,9 @@ class CategoryFixtures extends Fixture
             'Combat',
         ];
 
-        shuffle($categories);
-
-        for ($i = 0; $i < 10; $i++) {
+        foreach ($categories as $i => $categoryData) {
             $category = new Category();
-            $category->setName($categories[$i]);
+            $category->setName($categoryData);
             $manager->persist($category);
 
             $this->addReference('category_' . $i, $category);

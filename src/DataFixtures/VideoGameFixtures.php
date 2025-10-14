@@ -29,20 +29,22 @@ class VideoGameFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Resident Evil Village', 'description' => 'Survie et horreur.'],
         ];
 
-        for ($i = 0; $i < 10; $i++) {
+        foreach ($videoGames as $i => $gameData) {
             $videoGame = new VideoGame();
-            $videoGame->setTitle($videoGames[$i]['title']);
-            $videoGame->setReleaseDate($faker->dateTimeBetween('-20 years', 'now'));
-            $videoGame->setDescription($videoGames[$i]['description']);
+            $videoGame->setTitle($gameData['title']);
+            $videoGame->setReleaseDate($faker->dateTimeBetween('-1 week', '+2 week'));
+            $videoGame->setDescription($gameData['description']);
 
-            $videoGame->setEditor($this->getReference('editor_' . $faker->numberBetween(0, 9), Editor::class));
+            $videoGame->setEditor(
+                $this->getReference('editor_' . $faker->numberBetween(0, 9), Editor::class)
+            );
 
-            // 1 à 3 catégories par jeu
+            // 1 à 3 catégories aléatoires
             $categoriesCount = $faker->numberBetween(1, 3);
             $usedIndexes = [];
             for ($j = 0; $j < $categoriesCount; $j++) {
                 do {
-                    $catIndex = $faker->numberBetween(0, 9);
+                    $catIndex = $faker->numberBetween(0, 15);
                 } while (in_array($catIndex, $usedIndexes));
                 $usedIndexes[] = $catIndex;
 

@@ -24,12 +24,10 @@ class EditorFixtures extends Fixture
             ['name' => 'Sony Interactive Entertainment', 'country' => 'Japon'],
         ];
 
-        shuffle($editors);
-
-        for ($i = 0; $i < 10; $i++) {
+        foreach ($editors as $i => $editorData) {
             $editor = new Editor();
-            $editor->setName($editors[$i]['name']);
-            $editor->setCountry($editors[$i]['country']);
+            $editor->setName($editorData['name']);
+            $editor->setCountry($editorData['country']);
             $manager->persist($editor);
 
             $this->addReference('editor_' . $i, $editor);

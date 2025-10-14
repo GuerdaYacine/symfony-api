@@ -44,6 +44,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(message: "Le mot de passe est requis.")]
     private ?string $password = null;
 
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "Le news letter est requis")]
+    private ?bool $subscription_to_newsletter = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -123,5 +127,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // @deprecated, to be removed when upgrading to Symfony 8
+    }
+
+    public function isSubscriptionToNewsletter(): ?bool
+    {
+        return $this->subscription_to_newsletter;
+    }
+
+    public function setSubscriptionToNewsletter(bool $subscription_to_newsletter): static
+    {
+        $this->subscription_to_newsletter = $subscription_to_newsletter;
+
+        return $this;
     }
 }
