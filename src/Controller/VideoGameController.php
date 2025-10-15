@@ -186,7 +186,6 @@ final class VideoGameController extends AbstractController
         $editorId = $request->request->get('editor');
         $categoriesIds = json_decode($request->request->get('categories'), true);
 
-        // 📸 Récupère le fichier image
         $imageFile = $request->files->get('image');
 
         $videoGame = new VideoGame();
@@ -201,9 +200,13 @@ final class VideoGameController extends AbstractController
         $videoGame->setEditor($editor);
 
         $categories = $categoryRepository->findBy(['id' => $categoriesIds]);
-        if (count($categories) !== count($categoriesIds ?? [])) {
-            return $this->json(['error' => 'Une ou plusieurs catégories introuvables.'], Response::HTTP_NOT_FOUND);
+
+        if (is_array($categoriesIds)) {
+            if (count($categories) !== count($categoriesIds ?? [])) {
+                return $this->json(['error' => 'Une ou plusieurs catégories introuvables.'], Response::HTTP_NOT_FOUND);
+            }
         }
+
 
         foreach ($categories as $category) {
             $videoGame->addCategory($category);

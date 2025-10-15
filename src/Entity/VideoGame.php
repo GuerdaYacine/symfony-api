@@ -44,7 +44,6 @@ class VideoGame
      */
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'videoGames')]
     #[Assert\NotBlank(message: "Au moins une catégorie est requise")]
-    #[Assert\Type('int', message: "Veuillez entrez les ID des catégories.")]
     #[Groups(['videogame:read', 'videogame:write'])]
     private Collection $categories;
 
