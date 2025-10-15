@@ -153,21 +153,24 @@ final class VideoGameController extends AbstractController
     #[OA\Tag(name: "Video Games")]
     #[OA\RequestBody(
         required: true,
-        description: "Données pour créer un nouveau jeu vidéo",
-        content: new OA\JsonContent(
-            required: ["title", "releaseDate", "description", "editor", "categories"],
-            properties: [
-                new OA\Property(property: "title", type: "string", description: "Titre du jeu vidéo", example: "The Legend of Zelda: Breath of the Wild"),
-                new OA\Property(property: "releaseDate", type: "string", format: "date", description: "Date de sortie du jeu", example: "2017-03-03"),
-                new OA\Property(property: "description", type: "string", description: "Description du jeu vidéo", example: "Un jeu d'aventure en monde ouvert"),
-                new OA\Property(property: "editor", type: "integer", description: "ID de l'éditeur", example: 1),
-                new OA\Property(property: "categories", type: "array", items: new OA\Items(type: "integer"), description: "Liste des IDs des catégories", example: "[1, 2, 3]")
-            ]
+        description: "Données pour créer un nouveau jeu vidéo avec image",
+        content: new OA\MediaType(
+            mediaType: "multipart/form-data",
+            schema: new OA\Schema(
+                required: ["title", "releaseDate", "description", "editor", "categories"],
+                properties: [
+                    new OA\Property(property: "title", type: "string", example: "The Legend of Zelda"),
+                    new OA\Property(property: "releaseDate", type: "string", format: "date", example: "2017-03-03"),
+                    new OA\Property(property: "description", type: "string", example: "Un jeu d'aventure"),
+                    new OA\Property(property: "editor", type: "integer", example: 1),
+                    new OA\Property(property: "categories", type: "array", items: new OA\Items(type: "integer"), example: "[1, 2, 3]"),
+                    new OA\Property(property: "image", type: "string", format: "binary", description: "Image du jeu vidéo")
+                ]
+            )
         )
     )]
-    #[OA\Response(response: 201, description: "Jeu vidéo créé avec succès", content: new OA\JsonContent(ref: new Model(type: VideoGame::class, groups: ['videogame:write'])))]
+    #[OA\Response(response: 201, description: "Jeu vidéo créé avec succès")]
     #[OA\Response(response: 400, description: "Données invalides")]
-    #[OA\Response(response: 404, description: "Éditeur ou catégorie introuvable")]
     #[Security(name: "Bearer")]
     public function createVideoGame(
         Request $request,
@@ -175,30 +178,57 @@ final class VideoGameController extends AbstractController
         CategoryRepository $categoryRepository,
         EntityManager $em,
         ValidatorInterface $validator,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
     ): JsonResponse {
-        $data = json_decode($request->getContent(), true);
+        $title = $request->request->get('title');
+        $releaseDate = $request->request->get('releaseDate');
+        $description = $request->request->get('description');
+        $editorId = $request->request->get('editor');
+        $categoriesIds = json_decode($request->request->get('categories'), true);
+
+        // 📸 Récupère le fichier image
+        $imageFile = $request->files->get('image');
 
         $videoGame = new VideoGame();
-        $videoGame->setTitle($data['title']);
-        $videoGame->setReleaseDate(new \DateTime($data['releaseDate']));
-        $videoGame->setDescription($data['description']);
+        $videoGame->setTitle($title);
+        $videoGame->setReleaseDate(new \DateTime($releaseDate));
+        $videoGame->setDescription($description);
 
-        $editor = $editorRepository->find($data['editor']);
-
+        $editor = $editorRepository->find($editorId);
         if (!$editor) {
             return $this->json(['error' => 'Editeur introuvable.'], Response::HTTP_NOT_FOUND);
         }
         $videoGame->setEditor($editor);
 
-        $categories = $categoryRepository->findBy(['id' => $data['categories']]);
-
-        if (count($categories) !== count($data['categories'] ?? [])) {
+        $categories = $categoryRepository->findBy(['id' => $categoriesIds]);
+        if (count($categories) !== count($categoriesIds ?? [])) {
             return $this->json(['error' => 'Une ou plusieurs catégories introuvables.'], Response::HTTP_NOT_FOUND);
         }
 
         foreach ($categories as $category) {
             $videoGame->addCategory($category);
+        }
+
+        if ($imageFile) {
+            $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            $maxFileSize = 5 * 1024 * 1024; // 5MB
+
+            if (!in_array($imageFile->getMimeType(), $allowedMimeTypes)) {
+                return $this->json(['error' => 'Format d\'image non autorisé.'], Response::HTTP_BAD_REQUEST);
+            }
+
+            if ($imageFile->getSize() > $maxFileSize) {
+                return $this->json(['error' => 'L\'image est trop volumineuse (max 5MB).'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+
+            try {
+                $imageFile->move($this->getParameter('upload_directory'), $newFilename);
+                $videoGame->setCoverImage($newFilename);
+            } catch (\Exception $e) {
+                return $this->json(['error' => 'Erreur lors de l\'upload de l\'image.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         }
 
         $errors = $validator->validate($videoGame);
@@ -226,6 +256,15 @@ final class VideoGameController extends AbstractController
         $videoGame = $videoGameRepository->find($id);
         if (!$videoGame) {
             return $this->json(['error' => 'Jeu vidéo introuvable.'], Response::HTTP_NOT_FOUND);
+        }
+
+        $imageFile = $videoGame->getCoverImage();
+
+        if ($imageFile) {
+            $imagePath = $this->getParameter('upload_directory') . '/' . $imageFile;
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
         }
 
         $em->remove($videoGame);
