@@ -30,7 +30,7 @@ class VideoGame
     #[Assert\Type(
         type: \DateTimeInterface::class,
         message: "La date de sortie doit être une date valide (format YYYY-MM-DD)."
-    )]    
+    )]
     #[Groups(['videogame:read', 'videogame:write'])]
     private ?\DateTime $releaseDate = null;
 
@@ -43,11 +43,14 @@ class VideoGame
      * @var Collection<int, Category>
      */
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'videoGames')]
+    #[Assert\NotBlank(message: "Au moins une catégorie est requise")]
+    #[Assert\Type('int', message: "Veuillez entrez les ID des catégories.")]
     #[Groups(['videogame:read', 'videogame:write'])]
     private Collection $categories;
 
     #[ORM\ManyToOne(inversedBy: 'videoGames')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: "L'éditeur du jeu est requis")]
     #[Groups(['videogame:read', 'videogame:write'])]
     private ?Editor $editor = null;
 

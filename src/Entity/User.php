@@ -22,7 +22,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(message: "L'email est requise")]
-    #[Assert\Email]
+    #[Assert\Email(message: "Veuillez renseigner une email.")]
     #[Groups(['user:read', 'user:write'])]
     private ?string $email = null;
 
@@ -46,6 +46,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     #[Assert\NotBlank(message: "Le news letter est requis")]
+    #[Assert\Type('bool', message: "La valeur doit être un booléen (true ou false)")]
     private ?bool $subscription_to_newsletter = null;
 
     public function getId(): ?int
