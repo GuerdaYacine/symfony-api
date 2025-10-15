@@ -48,7 +48,7 @@ DATABASE_URL="mysql://utilisateur:motdepasse@127.0.0.1:3306/nom_base_données?se
 
 ```
 symfony console doctrine:database:create
-symfony doctrine:migrations:migrate
+symfony console doctrine:migrations:migrate
 symfony console doctrine:fixtures:load
 ```
 
