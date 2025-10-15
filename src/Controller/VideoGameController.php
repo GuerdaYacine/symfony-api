@@ -223,8 +223,14 @@ final class VideoGameController extends AbstractController
 
             $newFilename = uniqid() . '.' . $imageFile->guessExtension();
 
+            $uploadDir = $this->getParameter('upload_directory');
+
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0775, true);
+            }
+
             try {
-                $imageFile->move($this->getParameter('upload_directory'), $newFilename);
+                $imageFile->move($uploadDir, $newFilename);
                 $videoGame->setCoverImage($newFilename);
             } catch (\Exception $e) {
                 return $this->json(['error' => 'Erreur lors de l\'upload de l\'image.'], Response::HTTP_INTERNAL_SERVER_ERROR);
