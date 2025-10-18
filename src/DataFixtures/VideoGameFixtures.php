@@ -36,7 +36,7 @@ class VideoGameFixtures extends Fixture implements DependentFixtureInterface
             $videoGame->setDescription($gameData['description']);
 
             $videoGame->setEditor(
-                $this->getReference('editor_' . $faker->numberBetween(0, 14), Editor::class)
+                $this->getReference('editor_' . $faker->numberBetween(0, 9), Editor::class)
             );
 
             // 1 à 3 catégories aléatoires
