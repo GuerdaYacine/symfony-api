@@ -52,6 +52,16 @@ symfony console doctrine:migrations:migrate
 symfony console doctrine:fixtures:load
 ```
 
+### Créez les clés privées et publiques
+
+Commencez par créer un dossier jwt dans le dossier config, puis exécutez ces commandes dans un terminal Bash
+
+```
+openssl genrsa -out config/jwt/private.pem
+
+openssl rsa -in config/jwt/private.pem -pubout > config/jwt/public.pem
+```
+
 ### Démarrez le serveur
 
 ```
