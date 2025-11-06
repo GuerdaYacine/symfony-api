@@ -159,11 +159,13 @@
                         {% endif %}
 
                         {% if game.coverImage %}
-                            <div style="margin-top: 15px; text-align: center;">
-                                <img src="{{ absolute_url(asset('uploads/video_games/' ~ game.coverImage)) }}" 
-                                    alt="{{ game.title }}" 
-                                    style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                            </div>
+                            {% if embeddedImages[game.id] is defined %}
+                                <div style="margin-top: 15px; text-align: center;">
+                                    <img src="cid:{{ embeddedImages[game.id] }}" 
+                                        alt="{{ game.title }}" 
+                                        style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                </div>
+                            {% endif %}
                         {% endif %}
                     </div>
                 {% endfor %}

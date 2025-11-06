@@ -20,14 +20,28 @@ class NewsletterService
             ->from('no-reply@monsite.com')
             ->to($user->getEmail())
             ->subject('Nouvelle sortie de jeux vidéo cette semaine !')
-            ->htmlTemplate('emails/newsletter.html.twig')
-            ->context([
+            ->htmlTemplate('emails/newsletter.html.twig');
+
+            $embeddedImages = [];
+            foreach ($games as $index => $game) {
+                if ($game->getCoverImage()) {
+                    $path = 'public/uploads/video_games/'. $game->getCoverImage();
+
+                    if (file_exists($path)) {
+                        $cid = 'game_' . $index;
+                        $email->embedFromPath($path, $cid);
+                        $embeddedImages[$game->getId()] = $cid;
+                    }
+                }
+            }
+
+            $email->context([
                 'user' => $user,
                 'games' => $games,
+                'embeddedImages' => $embeddedImages,
             ]);
 
-        $this->mailer->send($email);
-
-        sleep(10);
+            $this->mailer->send($email);
+            sleep(10);
     }
 }
